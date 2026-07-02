@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FLXNR | Red Edition</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+<style>
+:root { --neon-red: #ff0055; }
+body { cursor: none; background: #050505; color: white; font-family: 'Inter', sans-serif; overflow: hidden; margin: 0; }
+
+.bg { position: fixed; inset: 0; background: radial-gradient(circle at 50% 50%, #1a000a, #050505); z-index: -3; }
+canvas { position: fixed; inset: 0; z-index: -2; pointer-events: none; }
+
+/* Nawigacja */
+.top-nav { position: absolute; top: 20px; width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 0 5%; box-sizing: border-box; z-index: 100; }
+.nav-left { display: flex; align-items: center; gap: 20px; }
+.home-btn { font-size: 1.5rem; color: white; cursor: pointer; transition: 0.3s; }
+.home-btn:hover { color: var(--neon-red); }
+
+.donate-nav { font-family: 'Orbitron'; color: var(--neon-red); text-decoration: none; border: 1px solid var(--neon-red); padding: 8px 20px; border-radius: 50px; transition: 0.3s; }
+.donate-nav:hover { background: var(--neon-red); color: white; }
+
+/* Social Media */
+.fixed-socials { display: flex; gap: 25px; margin-top: 15px; }
+.social-icon { font-size: 1.8rem; color: white; transition: 0.3s; text-decoration: none; }
+.social-icon:hover { color: var(--neon-red); }
+
+/* Przyciski */
+.btn { padding: 10px 25px; background: transparent; border: 1px solid var(--neon-red); color: var(--neon-red); cursor: pointer; font-family: 'Orbitron'; border-radius: 50px; transition: 0.3s; }
+.btn:hover { background: var(--neon-red); color: white; }
+
+/* Modal */
+.modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: none; justify-content: center; align-items: center; z-index: 1000; }
+.modal-content { background: #111; padding: 40px; border: 1px solid var(--neon-red); text-align: center; border-radius: 20px; }
+input { display: block; background: rgba(255,255,255,0.05); border: 1px solid #333; color: white; padding: 12px; margin: 10px 0; width: 220px; border-radius: 10px; }
+
+/* Strony */
+.page { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: opacity 0.8s ease; }
+.hidden { opacity: 0; pointer-events: none; }
+h1 { font-family: 'Orbitron'; font-size: clamp(3rem, 10vw, 8rem); color: transparent; -webkit-text-stroke: 2px var(--neon-red); filter: drop-shadow(0 0 15px var(--neon-red)); margin: 0; }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; width: 90%; max-width: 800px; margin-top: 20px; }
+.card { background: rgba(255,255,255,0.03); padding: 30px; border: 1px solid var(--neon-red); text-align: center; border-radius: 20px; }
+
+/* Kursor */
+.cursor { width: 40px; height: 40px; position: fixed; pointer-events: none; z-index: 9999; background-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 24 24" fill="%23ff0055" xmlns="http://www.w3.org/2000/svg"><path d="M12 2v6M2 12h20M12 22v-6M9 8h6v2H9zM10 10h4v4h-4zM9 14h6v2H9z"/></svg>'); background-size: contain; transition: transform 0.1s ease; }
+.cursor-grow { transform: scale(1.5) rotate(90deg); }
+</style>
+</head>
+<body>
+
+<div class="cursor"></div>
+<div class="bg"></div>
+<canvas id="c"></canvas>
+
+<!-- Top Nav -->
+<div class="top-nav">
+    <div class="nav-left">
+        <i class="fas fa-home home-btn" onclick="showHero()"></i>
+    </div>
+    <a href="https://ko-fi.com/flxnr" target="_blank" class="donate-nav">DONATE</a>
+    <div class="right-nav">
+        <button id="regBtn" class="btn" onclick="openModal()">ZAREJESTRUJ</button>
+        <span id="userNameDisplay" style="font-family: Orbitron; color: var(--neon-red);"></span>
+    </div>
+</div>
+
+<!-- Modal -->
+<div id="regModal" class="modal">
+    <div class="modal-content">
+        <input type="text" id="username" placeholder="Nazwa użytkownika">
+        <input type="email" id="email" placeholder="Email">
+        <input type="password" id="pass" placeholder="Hasło">
+        <button class="btn" onclick="register()">POTWIERDŹ</button>
+    </div>
+</div>
+
+<!-- Hero Page -->
+<div id="heroPage" class="page">
+    <h1>FLXNR</h1>
+    <div class="fixed-socials">
+        <a href="https://open.spotify.com/artist/0pQ510NuBkcc4wLg4bmCgz" class="social-icon"><i class="fab fa-spotify"></i></a>
+        <a href="https://www.youtube.com/@flixonar_music" class="social-icon"><i class="fab fa-youtube"></i></a>
+        <a href="https://www.tiktok.com/@flixonar_naszswiat" class="social-icon"><i class="fab fa-tiktok"></i></a>
+    </div>
+    <button class="btn" style="margin-top: 30px;" onclick="showMusic()">ENTER WORLD</button>
+</div>
+
+<!-- Music Page -->
+<div id="musicPage" class="page hidden">
+    <h2 style="color:var(--neon-red); font-family: 'Orbitron'; margin-bottom:20px;">MUSIC</h2>
+    <div class="cards">
+        <div class="card"><h3>MONTAGEM 1</h3></div>
+        <div class="card"><h3>MONTAGEM 2</h3></div>
+        <div class="card"><h3>MONTAGEM 3</h3></div>
+    </div>
+    <div class="fixed-socials" style="margin-top: 40px;">
+        <a href="https://open.spotify.com/artist/0pQ510NuBkcc4wLg4bmCgz" class="social-icon"><i class="fab fa-spotify"></i></a>
+        <a href="https://www.youtube.com/@flixonar_music" class="social-icon"><i class="fab fa-youtube"></i></a>
+        <a href="https://www.tiktok.com/@flixonar_naszswiat" class="social-icon"><i class="fab fa-tiktok"></i></a>
+    </div>
+</div>
+
+<script>
+function openModal() { document.getElementById('regModal').style.display = 'flex'; }
+function register() {
+    let user = document.getElementById('username').value;
+    if(!user) return;
+    localStorage.setItem('user', user);
+    document.getElementById('regModal').style.display = 'none';
+    document.getElementById('regBtn').style.display = 'none';
+    document.getElementById('userNameDisplay').innerText = "Witaj, " + user;
+}
+function showMusic() { 
+    document.getElementById('heroPage').classList.add('hidden'); 
+    document.getElementById('musicPage').classList.remove('hidden'); 
+}
+function showHero() { 
+    document.getElementById('musicPage').classList.add('hidden'); 
+    document.getElementById('heroPage').classList.remove('hidden'); 
+}
+
+const cursor = document.querySelector('.cursor');
+document.addEventListener('mousemove', (e) => { cursor.style.left = (e.clientX - 20) + 'px'; cursor.style.top = (e.clientY - 20) + 'px'; });
+document.querySelectorAll('button, a, .card, .home-btn').forEach(el => { el.addEventListener('mouseenter', () => cursor.classList.add('cursor-grow')); el.addEventListener('mouseleave', () => cursor.classList.remove('cursor-grow')); });
+
+const canvas = document.getElementById("c"); const ctx = canvas.getContext("2d"); canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+function animate() { requestAnimationFrame(animate); ctx.clearRect(0,0,canvas.width,canvas.height); ctx.fillStyle = "#ff0055"; ctx.beginPath(); ctx.arc(Math.random()*canvas.width, Math.random()*canvas.height, 1, 0, Math.PI*2); ctx.fill(); }
+animate();
+</script>
+</body>
+</html>
